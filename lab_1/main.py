@@ -48,7 +48,12 @@ def main() -> None:
     elif args.option == 2:
         df = open_csv(args.csv_path)
         logging.info(
-            dataframe.filter_with_param(df, args.width, args.height, args.label)
+            dataframe.filter_with_param(
+                df, 
+                args.width, 
+                args.height, 
+                args.label
+            )
         )
         logging.info("Filter by label with param work")
     elif args.option == 3:
