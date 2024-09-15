@@ -12,10 +12,8 @@ def open_csv(
         df = pd.read_csv(csv_path, delimiter=delimiter, names=column_names)
     else:
         df = pd.read_csv(csv_path, delimiter=delimiter)
-
     if remove_column is not None:
         df = df.drop(remove_column, axis=1)
-
     return df
 
 

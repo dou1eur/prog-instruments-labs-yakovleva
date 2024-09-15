@@ -24,7 +24,6 @@ def main() -> None:
         "3 - Groupping"
         "4 - Make histogram by random image",
     )
-
     parser.add_argument("--csv_path", help="Path to csv_file")
     parser.add_argument("--label", type=int, help="Label of image")
     parser.add_argument("--width", type=int, help="Width of image")
