@@ -7,10 +7,7 @@ from turtle import width
 import dataframe
 from csv_open_save import open_csv,  save_csv
 
-
 logging.basicConfig(filename="log.log", filemode="a", level=logging.INFO)
-
-
 
 
 def main():

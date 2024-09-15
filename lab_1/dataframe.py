@@ -4,7 +4,6 @@ import cv2
 import matplotlib.pyplot as plt
 import pandas as pd
 
-
 logging.basicConfig(filename="log.log", filemode="a", level=logging.INFO)
 
 
