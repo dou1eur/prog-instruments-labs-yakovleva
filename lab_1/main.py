@@ -2,8 +2,8 @@ import argparse
 import logging
 import sys
 
-import dataframe
 from csv_open_save import open_csv,  save_csv
+import dataframe
 
 logging.basicConfig(filename="log.log", filemode="a", level=logging.INFO)
 
