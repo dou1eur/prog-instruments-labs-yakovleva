@@ -55,7 +55,7 @@ def make_stats(df: pd.DataFrame) -> pd.DataFrame:
         logging.info("Balanced")
     else:
         logging.info(f"Not balanced, {abs(balance*100-100):.1f}%")
-    return pd.concat([img, df], axis = 1)
+    return pd.concat([img, df], axis=1)
 
 
 def filter_by_label(df: pd.DataFrame, label: int) -> pd.DataFrame:
@@ -93,7 +93,7 @@ def make_histogram(df: pd.DataFrame, label: int) -> list:
         filter_df = filter_by_label(df, label)
         img = filter_df["Absolute path"].sample().values[0]
         img_bgr = cv2.imread(img)
-        height, width, channels = img_bgr.shape
+        height, width = img_bgr.shape
         b, g, r = cv2.split(img_bgr)
         hist_b = cv2.calcHist(
             [b], [0], None, [256], [0, 256]

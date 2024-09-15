@@ -2,8 +2,6 @@ import argparse
 import logging
 import sys
 
-from turtle import width
-
 import dataframe
 from csv_open_save import open_csv,  save_csv
 
