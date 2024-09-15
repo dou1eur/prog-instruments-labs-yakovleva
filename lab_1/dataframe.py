@@ -9,7 +9,8 @@ logging.basicConfig(filename="log.log", filemode="a", level=logging.INFO)
 
 def make_dataframe(df: pd.DataFrame, tag: str) -> pd.DataFrame:
     """The function generates a dataframe with columns 
-    Absolute path, Height, Width, Depth and Label"""
+    Absolute path, Height, Width, Depth and Label
+    """
     try:
         abs_path = df["Absolute path"]
         height_img = []
@@ -40,7 +41,8 @@ def make_dataframe(df: pd.DataFrame, tag: str) -> pd.DataFrame:
 
 def make_stats(df: pd.DataFrame) -> pd.DataFrame:
     """The function receives the size of the image and 
-    label and determines the balance of data"""
+    label and determines the balance of data
+    """
     img = df[["Height", "Width", "Depth"]].describe()
     label_st = df["Label"]
     label_info = label_st.value_counts()
@@ -66,7 +68,8 @@ def filter_with_param(
     df: pd.DataFrame, width_max: int, height_max: int, label: str
 ) -> pd.DataFrame:
     """The function filters data by label and maximum 
-    width and height values"""
+    width and height values
+    """
     filtered_df = df[
         (df["Label"] == label)
         & (df["Width"] <= width_max)
@@ -77,7 +80,8 @@ def filter_with_param(
 
 def groupping(df: pd.DataFrame) -> pd.DataFrame:
     """The function groups data by label, counting the 
-    maximum, minimum and average number of pixels"""
+    maximum, minimum and average number of pixels
+    """
     df["Pixels"] = df["Height"] * df["Width"]
     gr_df = df.groupby("Label").agg({"Pixels": ["max", "min", "mean"]})
     return gr_df
