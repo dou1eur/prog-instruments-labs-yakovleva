@@ -54,8 +54,8 @@ def make_stats(df: pd.DataFrame) -> pd.DataFrame:
     if balance >= 0.95 and balance <= 1.05:
         logging.info("Balanced")
     else:
-        logging.info(f"Not balanced,{abs(balance*100-100):.1f}%")
-    return pd.concat([img, df], axis=1)
+        logging.info(f"Not balanced, {abs(balance*100-100):.1f}%")
+    return pd.concat([img, df], axis = 1)
 
 
 def filter_by_label(df: pd.DataFrame, label: int) -> pd.DataFrame:
