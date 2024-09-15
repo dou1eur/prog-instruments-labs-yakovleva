@@ -7,7 +7,9 @@ def open_csv(
     column_names: list = None,
     remove_column: str = None,
 ) -> pd.DataFrame:
-    """The function opens the csv as a dataframe with optional column names and delimiter"""
+    """The function opens the csv as a dataframe with optional
+    column names and delimiter
+    """
     if column_names is not None:
         df = pd.read_csv(csv_path, delimiter=delimiter, names=column_names)
     else:

@@ -8,7 +8,7 @@ logging.basicConfig(filename="log.log", filemode="a", level=logging.INFO)
 
 
 def make_dataframe(df: pd.DataFrame, tag: str) -> pd.DataFrame:
-    """The function generates a dataframe with columns 
+    """The function generates a dataframe with columns
     Absolute path, Height, Width, Depth and Label
     """
     try:
@@ -40,7 +40,7 @@ def make_dataframe(df: pd.DataFrame, tag: str) -> pd.DataFrame:
 
 
 def make_stats(df: pd.DataFrame) -> pd.DataFrame:
-    """The function receives the size of the image and 
+    """The function receives the size of the image and
     label and determines the balance of data
     """
     img = df[["Height", "Width", "Depth"]].describe()
@@ -67,7 +67,7 @@ def filter_by_label(df: pd.DataFrame, label: int) -> pd.DataFrame:
 def filter_with_param(
     df: pd.DataFrame, width_max: int, height_max: int, label: str
 ) -> pd.DataFrame:
-    """The function filters data by label and maximum 
+    """The function filters data by label and maximum
     width and height values
     """
     filtered_df = df[
@@ -79,7 +79,7 @@ def filter_with_param(
 
 
 def groupping(df: pd.DataFrame) -> pd.DataFrame:
-    """The function groups data by label, counting the 
+    """The function groups data by label, counting the
     maximum, minimum and average number of pixels
     """
     df["Pixels"] = df["Height"] * df["Width"]
@@ -95,9 +95,15 @@ def make_histogram(df: pd.DataFrame, label: int) -> list:
         img_bgr = cv2.imread(img)
         height, width, channels = img_bgr.shape
         b, g, r = cv2.split(img_bgr)
-        hist_b = cv2.calcHist([b], [0], None, [256], [0, 256]) / (height * width)
-        hist_g = cv2.calcHist([g], [0], None, [256], [0, 256]) / (height * width)
-        hist_r = cv2.calcHist([r], [0], None, [256], [0, 256]) / (height * width)
+        hist_b = cv2.calcHist(
+            [b], [0], None, [256], [0, 256]
+        ) / (height * width)
+        hist_g = cv2.calcHist(
+            [g], [0], None, [256], [0, 256]
+        ) / (height * width)
+        hist_r = cv2.calcHist(
+            [r], [0], None, [256], [0, 256]
+        ) / (height * width)
         hists = [hist_b, hist_g, hist_r]
         return hists
     except Exception as e:
