@@ -8,8 +8,15 @@ logging.basicConfig(filename="log.log", filemode="a", level=logging.INFO)
 
 
 def make_dataframe(df: pd.DataFrame, tag: str) -> pd.DataFrame:
-    """The function generates a dataframe with columns
-    Absolute path, Height, Width, Depth and Label
+    """
+    Generate a dataframe for image properties
+
+    Args:
+        df (pd.DataFrame): dataFrame containing the absolute paths of images and their tags
+        tag (str): the tag to classify images
+
+    Returns:
+        pd.DataFrame: updated DataFrame with height, width, depth, and label columns
     """
     try:
         abs_path = df["Absolute path"]
@@ -40,8 +47,14 @@ def make_dataframe(df: pd.DataFrame, tag: str) -> pd.DataFrame:
 
 
 def make_stats(df: pd.DataFrame) -> pd.DataFrame:
-    """The function receives the size of the image and
-    label and determines the balance of data
+    """
+    Calculate statistics for image sizes and label distribution
+
+    Args:
+        df (pd.DataFrame): dataFrame containing image properties
+
+    Returns:
+        pd.DataFrame: dataFrame summarizing image statistics and label balance
     """
     img = df[["Height", "Width", "Depth"]].describe()
     label_st = df["Label"]
@@ -59,7 +72,16 @@ def make_stats(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def filter_by_label(df: pd.DataFrame, label: int) -> pd.DataFrame:
-    """The function filters data by label"""
+    """
+    Filters data by label
+
+    Args:
+        df (pd.DataFrame): dataFrame containing image properties
+        label (int): the label to filter by
+
+    Returns:
+        pd.DataFrame: filtered DataFrame containing only rows with the specified label
+    """
     filtered_df = df[df["Label"] == label]
     return filtered_df
 
@@ -67,8 +89,17 @@ def filter_by_label(df: pd.DataFrame, label: int) -> pd.DataFrame:
 def filter_with_param(
     df: pd.DataFrame, width_max: int, height_max: int, label: str
 ) -> pd.DataFrame:
-    """The function filters data by label and maximum
-    width and height values
+    """
+    Filter data by label and maximum width and height values
+
+    Args:
+        df (pd.DataFrame): dataFrame containing image properties
+        width_max (int): maximum width for filtering
+        height_max (int): maximum height for filtering
+        label (int): the label to filter by
+
+    Returns:
+        pd.DataFrame: filtered DataFrame
     """
     filtered_df = df[
         (df["Label"] == label)
@@ -79,8 +110,14 @@ def filter_with_param(
 
 
 def groupping(df: pd.DataFrame) -> pd.DataFrame:
-    """The function groups data by label, counting the
-    maximum, minimum and average number of pixels
+    """
+    Group the DataFrame by label and calculate pixel statistics
+
+    Args:
+        df (pd.DataFrame): dataFrame containing image properties.
+
+    Returns:
+        pd.DataFrame: dataFrame with pixel statistics
     """
     df["Pixels"] = df["Height"] * df["Width"]
     gr_df = df.groupby("Label").agg({"Pixels": ["max", "min", "mean"]})
@@ -88,7 +125,16 @@ def groupping(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def make_histogram(df: pd.DataFrame, label: int) -> list:
-    """The function creates a histogram for a random image"""
+    """
+    Create a histogram for a random image of the specified label
+
+    Args:
+        df (pd.DataFrame): dataFrame containing image properties
+        label (int): the label of the image to create a histogram for
+
+    Returns:
+        list: a list containing histograms for the blue, green, and red channels
+    """
     try:
         filter_df = filter_by_label(df, label)
         img = filter_df["Absolute path"].sample().values[0]
@@ -111,7 +157,12 @@ def make_histogram(df: pd.DataFrame, label: int) -> list:
 
 
 def draw_histogram(hists: list) -> None:
-    """The function draws histograms using matplotlib"""
+    """
+    Draw histograms using matplotlib
+
+    Args:
+        hists (list): list of histograms
+    """
     colors = ["blue", "green", "red"]
     for i in range(len(hists)):
         plt.plot(hists[i], color=colors[i], label=f"histogram {i}")

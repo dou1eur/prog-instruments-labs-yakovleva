@@ -9,6 +9,9 @@ logging.basicConfig(filename="log.log", filemode="a", level=logging.INFO)
 
 
 def main() -> None:
+    """
+    Main function for parsing command line arguments and executing tasks
+    """
     parser = argparse.ArgumentParser(description="Options")
     parser.add_argument(
         "-o",

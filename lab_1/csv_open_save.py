@@ -7,8 +7,17 @@ def open_csv(
     column_names: list = None,
     remove_column: str = None,
 ) -> pd.DataFrame:
-    """The function opens the csv as a dataframe with optional
-    column names and delimiter
+    """
+    Open a CSV file and return it as a DataFrame
+
+    Args:
+        csv_path (str): the path to csv file
+        delimiter (str, optional): the delimiter used in the csv file
+        column_names (list, optional): list of column names to use
+        remove_column (str, optional): name of the column to remove from the DataFrame
+
+    Returns:
+        pd.DataFrame: dataFrame containing the data from the csv file
     """
     if column_names is not None:
         df = pd.read_csv(csv_path, delimiter=delimiter, names=column_names)
@@ -20,5 +29,11 @@ def open_csv(
 
 
 def save_csv(df: pd.DataFrame, file_path: str) -> None:
-    """The function saves the dataframe to csv"""
+    """
+    Save the DataFrame to a csv file
+
+    Args:
+        df (pd.DataFrame): the DataFrame to save
+        file_path (str): the path where the csv file will be saved
+    """
     df.to_csv(file_path, index=False)
