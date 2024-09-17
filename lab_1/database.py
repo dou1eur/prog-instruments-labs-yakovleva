@@ -1,9 +1,9 @@
 import sqlite3
 
-#Open database
-conn = sqlite3.connect('database.db')
+DATABASE_NAME = 'database.db'
 
-#Create table
+conn = sqlite3.connect(DATABASE_NAME)
+
 conn.execute('''CREATE TABLE users 
 		(userId INTEGER PRIMARY KEY, 
 		password TEXT,
