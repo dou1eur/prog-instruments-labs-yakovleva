@@ -1,6 +1,9 @@
-from flask import *
-import sqlite3, hashlib, os
+import os
+import hashlib
+import sqlite3
+
 from werkzeug.utils import secure_filename
+import flask
 
 app = Flask(__name__)
 app.secret_key = 'random string'
