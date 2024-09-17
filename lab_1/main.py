@@ -22,9 +22,9 @@ def getLoginDetails():
             noOfItems = 0
         else:
             loggedIn = True
-            cur.execute('SELECT userId, firstName FROM users WHERE email = ?', (session['email'], ))
+            cur.execute('SELECT userId, firstName FROM users WHERE email = ?', (session['email'],))
             userId, firstName = cur.fetchone()
-            cur.execute('SELECT count(productId) FROM kart WHERE userId = ?', (userId, ))
+            cur.execute('SELECT count(productId) FROM kart WHERE userId = ?', (userId,))
             noOfItems = cur.fetchone()[0]
     conn.close()
     return (loggedIn, firstName, noOfItems)
@@ -62,7 +62,6 @@ def addItem():
         stock = int(request.form['stock'])
         categoryId = int(request.form['category'])
 
-        #Uploading image procedure
         image = request.files['image']
         if image and allowed_file(image.filename):
             filename = secure_filename(image.filename)
@@ -73,9 +72,9 @@ def addItem():
                 cur = conn.cursor()
                 cur.execute("""INSERT INTO products (name, price, description, image, stock, categoryId) VALUES (?, ?, ?, ?, ?, ?)""", (name, price, description, imagename, stock, categoryId))
                 conn.commit()
-                msg='added successfully'
+                msg ='added successfully'
             except:
-                msg='error occured'
+                msg ='error occured'
                 conn.rollback()
         conn.close()
         print(msg)
@@ -98,7 +97,7 @@ def removeItem():
     with sqlite3.connect('database.db') as conn:
         try:
             cur = conn.cursor()
-            cur.execute('DELETE FROM products WHERE productID = ?', (productId, ))
+            cur.execute('DELETE FROM products WHERE productID = ?', (productId,))
             conn.commit()
             msg = 'Deleted successsfully'
         except:
@@ -115,7 +114,7 @@ def displayCategory():
         categoryId = request.args.get('categoryId')
         with sqlite3.connect('database.db') as conn:
             cur = conn.cursor()
-            cur.execute('SELECT products.productId, products.name, products.price, products.image, categories.name FROM products, categories WHERE products.categoryId = categories.categoryId AND categories.categoryId = ?', (categoryId, ))
+            cur.execute('SELECT products.productId, products.name, products.price, products.image, categories.name FROM products, categories WHERE products.categoryId = categories.categoryId AND categories.categoryId = ?', (categoryId,))
             data = cur.fetchall()
         conn.close()
         categoryName = data[0][4]
@@ -138,7 +137,7 @@ def editProfile():
     loggedIn, firstName, noOfItems = getLoginDetails()
     with sqlite3.connect('database.db') as conn:
         cur = conn.cursor()
-        cur.execute('SELECT userId, email, firstName, lastName, address1, address2, zipcode, city, state, country, phone FROM users WHERE email = ?', (session['email'], ))
+        cur.execute('SELECT userId, email, firstName, lastName, address1, address2, zipcode, city, state, country, phone FROM users WHERE email = ?', (session['email'],))
         profileData = cur.fetchone()
     conn.close()
     return render_template('editProfile.html', profileData=profileData, loggedIn=loggedIn, firstName=firstName, noOfItems=noOfItems)
@@ -155,13 +154,13 @@ def changePassword():
         newPassword = hashlib.md5(newPassword.encode()).hexdigest()
         with sqlite3.connect('database.db') as conn:
             cur = conn.cursor()
-            cur.execute('SELECT userId, password FROM users WHERE email = ?', (session['email'], ))
+            cur.execute('SELECT userId, password FROM users WHERE email = ?', (session['email'],))
             userId, password = cur.fetchone()
             if (password == oldPassword):
                 try:
                     cur.execute('UPDATE users SET password = ? WHERE userId = ?', (newPassword, userId))
                     conn.commit()
-                    msg='Changed successfully'
+                    msg ='Changed successfully'
                 except:
                     conn.rollback()
                     msg = 'Failed'
@@ -191,7 +190,6 @@ def updateProfile():
                 try:
                     cur = con.cursor()
                     cur.execute('UPDATE users SET firstName = ?, lastName = ?, address1 = ?, address2 = ?, zipcode = ?, city = ?, state = ?, country = ?, phone = ? WHERE email = ?', (firstName, lastName, address1, address2, zipcode, city, state, country, phone, email))
-
                     con.commit()
                     msg = 'Saved Successfully'
                 except:
@@ -209,7 +207,7 @@ def loginForm():
         return render_template('login.html', error='')
 
 
-@app.route('/login', methods = ['POST', 'GET'])
+@app.route('/login', methods=['POST', 'GET'])
 def login():
     if request.method == 'POST':
         email = request.form['email']
@@ -228,10 +226,10 @@ def productDescription():
     productId = request.args.get('productId')
     with sqlite3.connect('database.db') as conn:
         cur = conn.cursor()
-        cur.execute('SELECT productId, name, price, description, image, stock FROM products WHERE productId = ?', (productId, ))
+        cur.execute('SELECT productId, name, price, description, image, stock FROM products WHERE productId = ?', (productId,))
         productData = cur.fetchone()
     conn.close()
-    return render_template('productDescription.html', data=productData, loggedIn = loggedIn, firstName = firstName, noOfItems = noOfItems)
+    return render_template('productDescription.html', data=productData, loggedIn=loggedIn, firstName=firstName, noOfItems=noOfItems)
 
 
 @app.route('/addToCart')
@@ -242,7 +240,7 @@ def addToCart():
         productId = int(request.args.get('productId'))
         with sqlite3.connect('database.db') as conn:
             cur = conn.cursor()
-            cur.execute('SELECT userId FROM users WHERE email = ?', (session['email'], ))
+            cur.execute('SELECT userId FROM users WHERE email = ?', (session['email'],))
             userId = cur.fetchone()[0]
             try:
                 cur.execute('INSERT INTO kart (userId, productId) VALUES (?, ?)', (userId, productId))
@@ -263,14 +261,14 @@ def cart():
     email = session['email']
     with sqlite3.connect('database.db') as conn:
         cur = conn.cursor()
-        cur.execute('SELECT userId FROM users WHERE email = ?', (email, ))
+        cur.execute('SELECT userId FROM users WHERE email = ?', (email,))
         userId = cur.fetchone()[0]
-        cur.execute('SELECT products.productId, products.name, products.price, products.image FROM products, kart WHERE products.productId = kart.productId AND kart.userId = ?', (userId, ))
+        cur.execute('SELECT products.productId, products.name, products.price, products.image FROM products, kart WHERE products.productId = kart.productId AND kart.userId = ?', (userId,))
         products = cur.fetchall()
     totalPrice = 0
     for row in products:
         totalPrice += row[2]
-    return render_template('cart.html', products = products, totalPrice=totalPrice, loggedIn=loggedIn, firstName=firstName, noOfItems=noOfItems)
+    return render_template('cart.html', products=products, totalPrice=totalPrice, loggedIn=loggedIn, firstName=firstName, noOfItems=noOfItems)
 
 
 @app.route('/removeFromCart')
@@ -281,7 +279,7 @@ def removeFromCart():
     productId = int(request.args.get('productId'))
     with sqlite3.connect('database.db') as conn:
         cur = conn.cursor()
-        cur.execute('SELECT userId FROM users WHERE email = ?', (email, ))
+        cur.execute('SELECT userId FROM users WHERE email = ?', (email,))
         userId = cur.fetchone()[0]
         try:
             cur.execute('DELETE FROM kart WHERE userId = ? AND productId = ?', (userId, productId))
@@ -311,10 +309,9 @@ def is_valid(email, password):
     return False
 
 
-@app.route('/register', methods = ['GET', 'POST'])
+@app.route('/register', methods=['GET', 'POST'])
 def register():
-    if request.method == 'POST':
-        #Parse form data    
+    if request.method == 'POST':  
         password = request.form['password']
         email = request.form['email']
         firstName = request.form['firstName']
@@ -331,9 +328,7 @@ def register():
             try:
                 cur = con.cursor()
                 cur.execute('INSERT INTO users (password, email, firstName, lastName, address1, address2, zipcode, city, state, country, phone) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', (hashlib.md5(password.encode()).hexdigest(), email, firstName, lastName, address1, address2, zipcode, city, state, country, phone))
-
                 con.commit()
-
                 msg = 'Registered Successfully'
             except:
                 con.rollback()
