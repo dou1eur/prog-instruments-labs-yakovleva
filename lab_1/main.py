@@ -1,6 +1,7 @@
 import os
 import hashlib
 import sqlite3
+from typing import List, Tuple
 
 from werkzeug.utils import secure_filename
 import flask
@@ -13,7 +14,7 @@ app.secret_key = 'random string'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 
-def getLoginDetails():
+def getLoginDetails() -> Tuple[bool, str, int]:
     with sqlite3.connect('database.db') as conn:
         cur = conn.cursor()
         if 'email' not in session:
@@ -31,7 +32,7 @@ def getLoginDetails():
 
 
 @app.route('/')
-def root():
+def root() -> str:
     loggedIn, firstName, noOfItems = getLoginDetails()
     with sqlite3.connect('database.db') as conn:
         cur = conn.cursor()
@@ -44,7 +45,7 @@ def root():
 
 
 @app.route('/add')
-def admin():
+def admin() -> str:
     with sqlite3.connect('database.db') as conn:
         cur = conn.cursor()
         cur.execute('SELECT categoryId, name FROM categories')
@@ -54,7 +55,7 @@ def admin():
 
 
 @app.route('/addItem', methods=['GET', 'POST'])
-def addItem():
+def addItem() -> flask.Response:
     if request.method == 'POST':
         name = request.form['name']
         price = float(request.form['price'])
@@ -82,7 +83,7 @@ def addItem():
 
 
 @app.route('/remove')
-def remove():
+def remove() -> str:
     with sqlite3.connect('database.db') as conn:
         cur = conn.cursor()
         cur.execute('SELECT productId, name, price, description, image, stock FROM products')
@@ -92,7 +93,7 @@ def remove():
 
 
 @app.route('/removeItem')
-def removeItem():
+def removeItem() -> flask.Response:
     productId = request.args.get('productId')
     with sqlite3.connect('database.db') as conn:
         try:
@@ -109,7 +110,7 @@ def removeItem():
 
 
 @app.route('/displayCategory')
-def displayCategory():
+def displayCategory() -> str:
         loggedIn, firstName, noOfItems = getLoginDetails()
         categoryId = request.args.get('categoryId')
         with sqlite3.connect('database.db') as conn:
@@ -123,7 +124,7 @@ def displayCategory():
 
 
 @app.route('/account/profile')
-def profileHome():
+def profileHome() -> str:
     if 'email' not in session:
         return redirect(url_for('root'))
     loggedIn, firstName, noOfItems = getLoginDetails()
@@ -131,7 +132,7 @@ def profileHome():
 
 
 @app.route('/account/profile/edit')
-def editProfile():
+def editProfile() -> str:
     if 'email' not in session:
         return redirect(url_for('root'))
     loggedIn, firstName, noOfItems = getLoginDetails()
@@ -144,7 +145,7 @@ def editProfile():
 
 
 @app.route('/account/profile/changePassword', methods=['GET', 'POST'])
-def changePassword():
+def changePassword() -> str:
     if 'email' not in session:
         return redirect(url_for('loginForm'))
     if request.method == 'POST':
@@ -174,7 +175,7 @@ def changePassword():
 
 
 @app.route('/updateProfile', methods=['GET', 'POST'])
-def updateProfile():
+def updateProfile() -> flask.Response:
     if request.method == 'POST':
         email = request.form['email']
         firstName = request.form['firstName']
@@ -200,7 +201,7 @@ def updateProfile():
 
 
 @app.route('/loginForm')
-def loginForm():
+def loginForm() -> str:
     if 'email' in session:
         return redirect(url_for('root'))
     else:
@@ -208,7 +209,7 @@ def loginForm():
 
 
 @app.route('/login', methods=['POST', 'GET'])
-def login():
+def login() -> str:
     if request.method == 'POST':
         email = request.form['email']
         password = request.form['password']
@@ -221,7 +222,7 @@ def login():
 
 
 @app.route('/productDescription')
-def productDescription():
+def productDescription() -> str:
     loggedIn, firstName, noOfItems = getLoginDetails()
     productId = request.args.get('productId')
     with sqlite3.connect('database.db') as conn:
@@ -233,7 +234,7 @@ def productDescription():
 
 
 @app.route('/addToCart')
-def addToCart():
+def addToCart() -> flask.Response:
     if 'email' not in session:
         return redirect(url_for('loginForm'))
     else:
@@ -254,7 +255,7 @@ def addToCart():
 
 
 @app.route('/cart')
-def cart():
+def cart() -> str:
     if 'email' not in session:
         return redirect(url_for('loginForm'))
     loggedIn, firstName, noOfItems = getLoginDetails()
@@ -272,7 +273,7 @@ def cart():
 
 
 @app.route('/removeFromCart')
-def removeFromCart():
+def removeFromCart() -> flask.Response:
     if 'email' not in session:
         return redirect(url_for('loginForm'))
     email = session['email']
@@ -293,12 +294,12 @@ def removeFromCart():
 
 
 @app.route('/logout')
-def logout():
+def logout() -> flask.Response:
     session.pop('email', None)
     return redirect(url_for('root'))
 
 
-def is_valid(email, password):
+def is_valid(email, password) -> bool:
     con = sqlite3.connect('database.db')
     cur = con.cursor()
     cur.execute('SELECT email, password FROM users')
@@ -310,7 +311,7 @@ def is_valid(email, password):
 
 
 @app.route('/register', methods=['GET', 'POST'])
-def register():
+def register() -> str:
     if request.method == 'POST':  
         password = request.form['password']
         email = request.form['email']
@@ -338,16 +339,16 @@ def register():
 
 
 @app.route('/registerationForm')
-def registrationForm():
+def registrationForm() -> str:
     return render_template('register.html')
 
 
-def allowed_file(filename):
+def allowed_file(filename: str) -> bool:
     return '.' in filename and \
             filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
 
 
-def parse(data):
+def parse(data: List[int]) -> List[List[int]]:
     ans = []
     i = 0
     while i < len(data):
