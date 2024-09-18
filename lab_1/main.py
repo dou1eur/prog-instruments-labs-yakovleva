@@ -1,10 +1,10 @@
-import os
 import hashlib
+import os
 import sqlite3
 from typing import List, Tuple
 
+from flask import Flask, Response, request, session, redirect, url_for, render_template
 from werkzeug.utils import secure_filename
-import flask
 
 UPLOAD_FOLDER = "static/uploads"
 ALLOWED_EXTENSIONS = {"jpeg", "jpg", "png", "gif"}
@@ -93,12 +93,12 @@ def admin() -> str:
 
 
 @app.route("/addItem", methods=["GET", "POST"])
-def addItem() -> flask.Response:
+def addItem() -> Response:
     """
     Adding a new item: if successful, redirects to the home page
 
     Returns:
-        flask.Response: response with redirect to the home page
+        Response: response with redirect to the home page
     """
     if request.method == "POST":
         name = request.form["name"]
@@ -151,13 +151,13 @@ def remove() -> str:
 
 
 @app.route("/removeItem")
-def removeItem() -> flask.Response:
+def removeItem() -> Response:
     """
     Extracts the product ID from the request arguments and
     removes the corresponding product from the database
 
     Returns:
-        flask.Response: response with redirect to the home page
+        Response: response with redirect to the home page
     """
     productId = request.args.get("productId")
 
@@ -311,14 +311,14 @@ def changePassword() -> str:
 
 
 @app.route("/updateProfile", methods=["GET", "POST"])
-def updateProfile() -> flask.Response:
+def updateProfile() -> Response:
     """
     If the request method is POST, retrieves the user profile
     data from the form and updates it in the database. Redirects
     to the profile edit page upon completion
 
     Returns:
-        flask.Response: response with a redirect to the profile edit page
+        Response: response with a redirect to the profile edit page
     """
     if request.method == "POST":
         email = request.form["email"]
@@ -426,13 +426,13 @@ def productDescription() -> str:
 
 
 @app.route("/addToCart")
-def addToCart() -> flask.Response:
+def addToCart() -> Response:
     """
     Retrieves the product ID from the request
     arguments and adds the product to the user's cart
 
     Returns:
-        flask.Response: response with a redirect to the home page
+        Response: response with a redirect to the home page
     """
     if "email" not in session:
         return redirect(url_for("loginForm"))
@@ -501,13 +501,13 @@ def cart() -> str:
 
 
 @app.route("/removeFromCart")
-def removeFromCart() -> flask.Response:
+def removeFromCart() -> Response:
     """
     Retrieves the product ID from the request arguments
     and removes the product from the cart
 
     Returns:
-        flask.Response: response with a redirect to the home page
+        Response: response with a redirect to the home page
     """
     if "email" not in session:
         return redirect(url_for("loginForm"))
@@ -537,13 +537,13 @@ def removeFromCart() -> flask.Response:
 
 
 @app.route("/logout")
-def logout() -> flask.Response:
+def logout() -> Response:
     """
     Delete the user's email from the session and redirects
     to the home page
 
     Returns:
-        flask.Response: Response with a redirect to the home page
+        Response: Response with a redirect to the home page
     """
     session.pop("email", None)
     return redirect(url_for("root"))
