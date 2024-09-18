@@ -17,8 +17,7 @@ app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 def getLoginDetails() -> Tuple[bool, str, int]:
     """
     Get the user's login data and check if they are logged in
-    If so, it retrieves the username and the number of items
-    in their cart
+    If so, it retrieves the username and the number of items in their cart
 
     Returns:
         Tuple[bool, str, int]:
@@ -136,8 +135,7 @@ def addItem() -> flask.Response:
 @app.route("/remove")
 def remove() -> str:
     """
-    Retrieves all products from the database and displays
-    the item delete page
+    Retrieves all products from the database and displays the item delete page
 
     Returns:
         str: generated HTML for the item delete page
