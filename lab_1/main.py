@@ -15,6 +15,18 @@ app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 
 
 def getLoginDetails() -> Tuple[bool, str, int]:
+    """
+    Get the user's login data and check if they are logged in
+    If so, it retrieves the username and the number of items
+    in their cart
+
+    Returns:
+        Tuple[bool, str, int]:
+            - loggedIn (bool): indicates whether the user is logged in
+            - firstName (str): the username if logged in, an empty
+              string otherwise
+            - noOfItems (int): the number of items in the cart
+    """
     with sqlite3.connect("database.db") as conn:
         cur = conn.cursor()
         if "email" not in session:
@@ -38,6 +50,13 @@ def getLoginDetails() -> Tuple[bool, str, int]:
 
 @app.route("/")
 def root() -> str:
+    """
+    Shows the home page: retrieves the product, category and user
+    login status, then displays the home page
+
+    Returns:
+        str: generated HTML for the home page
+    """
     loggedIn, firstName, noOfItems = getLoginDetails()
     with sqlite3.connect("database.db") as conn:
         cur = conn.cursor()
@@ -61,6 +80,12 @@ def root() -> str:
 
 @app.route("/add")
 def admin() -> str:
+    """
+    Fetches category data and renders the add item page
+
+    Returns:
+        str: generated HTML code for the add item page
+    """
     with sqlite3.connect("database.db") as conn:
         cur = conn.cursor()
         cur.execute("SELECT categoryId, name FROM categories")
@@ -70,6 +95,12 @@ def admin() -> str:
 
 @app.route("/addItem", methods=["GET", "POST"])
 def addItem() -> flask.Response:
+    """
+    Adding a new item: if successful, redirects to the home page
+
+    Returns:
+        flask.Response: response with redirect to the home page
+    """
     if request.method == "POST":
         name = request.form["name"]
         price = float(request.form["price"])
@@ -104,6 +135,13 @@ def addItem() -> flask.Response:
 
 @app.route("/remove")
 def remove() -> str:
+    """
+    Retrieves all products from the database and displays
+    the item delete page
+
+    Returns:
+        str: generated HTML for the item delete page
+    """
     with sqlite3.connect("database.db") as conn:
         cur = conn.cursor()
         cur.execute(
@@ -116,6 +154,13 @@ def remove() -> str:
 
 @app.route("/removeItem")
 def removeItem() -> flask.Response:
+    """
+    Extracts the product ID from the request arguments and
+    removes the corresponding product from the database
+
+    Returns:
+        flask.Response: response with redirect to the home page
+    """
     productId = request.args.get("productId")
 
     with sqlite3.connect("database.db") as conn:
@@ -136,6 +181,13 @@ def removeItem() -> flask.Response:
 
 @app.route("/displayCategory")
 def displayCategory() -> str:
+    """
+    Retrieves products belonging to the specified category from
+    the database and displays the display category page
+
+    Returns:
+        str: generated HTML for the display category page
+    """
     loggedIn, firstName, noOfItems = getLoginDetails()
     categoryId = request.args.get("categoryId")
 
@@ -143,7 +195,7 @@ def displayCategory() -> str:
         cur = conn.cursor()
         cur.execute(
             "SELECT products.productId, products.name, products.price,"
-            "products.image, categories.name FROM products, categories "
+            "products.image, categories.name FROM products, categories"
             "WHERE products.categoryId = categories.categoryId AND"
             "categories.categoryId = ?"
             (categoryId,),
@@ -164,6 +216,13 @@ def displayCategory() -> str:
 
 @app.route("/account/profile")
 def profileHome() -> str:
+    """
+    Checks if the user is logged in. If not, redirects to
+    the home page. Otherwise, displays the profile home page
+
+    Returns:
+        str: generated HTML for the profile home page
+    """
     if "email" not in session:
         return redirect(url_for("root"))
     loggedIn, firstName, noOfItems = getLoginDetails()
@@ -177,6 +236,14 @@ def profileHome() -> str:
 
 @app.route("/account/profile/edit")
 def editProfile() -> str:
+    """
+    Checks if the user is logged in. If not, redirects to
+    the home page. Otherwise, fetches the user's profile data
+    and displays the profile edit page
+
+    Returns:
+        str: generated HTML for the profile edit page
+    """
     if "email" not in session:
         return redirect(url_for("root"))
     loggedIn, firstName, noOfItems = getLoginDetails()
@@ -201,6 +268,14 @@ def editProfile() -> str:
 
 @app.route("/account/profile/changePassword", methods=["GET", "POST"])
 def changePassword() -> str:
+    """
+    If the request method is POST, retrieves the
+    old and new passwords, checks the old password, and
+    updates the password in the database if it is valid
+
+    Returns:
+        str: generated HTML for the password change page
+    """
     if "email" not in session:
         return redirect(url_for("loginForm"))
 
@@ -239,6 +314,14 @@ def changePassword() -> str:
 
 @app.route("/updateProfile", methods=["GET", "POST"])
 def updateProfile() -> flask.Response:
+    """
+    If the request method is POST, retrieves the user profile
+    data from the form and updates it in the database. Redirects
+    to the profile edit page upon completion
+
+    Returns:
+        flask.Response: response with a redirect to the profile edit page
+    """
     if request.method == "POST":
         email = request.form["email"]
         firstName = request.form["firstName"]
@@ -281,6 +364,13 @@ def updateProfile() -> flask.Response:
 
 @app.route("/loginForm")
 def loginForm() -> str:
+    """
+    Checks if the user is already logged in. If so, redirects to
+    the home page. Otherwise, renders the login page
+
+    Returns:
+        str: generated HTML code for the login page
+    """
     if "email" in session:
         return redirect(url_for("root"))
     else:
@@ -289,6 +379,14 @@ def loginForm() -> str:
 
 @app.route("/login", methods=["POST", "GET"])
 def login() -> str:
+    """
+    If the request method is POST, retrieves the email and
+    password from the form. Validates the credentials and
+    establishes a session if valid
+
+    Returns:
+        str: generated HTML code for the login page
+    """
     if request.method == "POST":
         email = request.form["email"]
         password = request.form["password"]
@@ -302,6 +400,13 @@ def login() -> str:
 
 @app.route("/productDescription")
 def productDescription() -> str:
+    """
+    Retrieves product details based on the product ID from the
+    request arguments and renders the product description page
+
+    Returns:
+        str: generated HTML code for the product description page
+    """
     loggedIn, firstName, noOfItems = getLoginDetails()
     productId = request.args.get("productId")
 
@@ -324,6 +429,13 @@ def productDescription() -> str:
 
 @app.route("/addToCart")
 def addToCart() -> flask.Response:
+    """
+    Retrieves the product ID from the request
+    arguments and adds the product to the user's cart
+
+    Returns:
+        flask.Response: response with a redirect to the home page
+    """
     if "email" not in session:
         return redirect(url_for("loginForm"))
 
@@ -351,6 +463,13 @@ def addToCart() -> flask.Response:
 
 @app.route("/cart")
 def cart() -> str:
+    """
+    Retrieves the user's cart items from the
+    database and calculates the total price
+
+    Returns:
+        str: generated HTML code for the cart page
+    """
     if "email" not in session:
         return redirect(url_for("loginForm"))
 
@@ -385,6 +504,13 @@ def cart() -> str:
 
 @app.route("/removeFromCart")
 def removeFromCart() -> flask.Response:
+    """
+    Retrieves the product ID from the request arguments
+    and removes the product from the cart
+
+    Returns:
+        flask.Response: response with a redirect to the home page
+    """
     if "email" not in session:
         return redirect(url_for("loginForm"))
 
@@ -414,11 +540,29 @@ def removeFromCart() -> flask.Response:
 
 @app.route("/logout")
 def logout() -> flask.Response:
+    """
+    Delete the user's email from the session and redirects
+    to the home page
+
+    Returns:
+        flask.Response: Response with a redirect to the home page
+    """
     session.pop("email", None)
     return redirect(url_for("root"))
 
 
 def is_valid(email: str, password: str) -> bool:
+    """
+    Checks if the provided email and password match an
+    existing user in the database
+
+    Args:
+        email (str): the user's email address
+        password (str): the user's password
+
+    Returns:
+        bool: True if the credentials are valid, False otherwise
+    """
     con = sqlite3.connect("database.db")
     cur = con.cursor()
     cur.execute("SELECT email, password FROM users")
@@ -432,6 +576,13 @@ def is_valid(email: str, password: str) -> bool:
 
 @app.route("/register", methods=["GET", "POST"])
 def register() -> str:
+    """
+    If the request method is POST, retrieves the user's input
+    data and inserts it into the new data into the database
+
+    Returns:
+        str: generated HTML code for the login page
+    """
     if request.method == "POST":
         password = request.form["password"]
         email = request.form["email"]
@@ -469,15 +620,39 @@ def register() -> str:
 
 @app.route("/registerationForm")
 def registrationForm() -> str:
+    """
+    Shows the registration form
+
+    Returns:
+        str: generated HTML code for the registration page
+    """
     return render_template("register.html")
 
 
 def allowed_file(filename: str) -> bool:
+    """
+    Checks if the uploaded file matches the available permissions
+
+    Args:
+        filename (str): еhe name of the uploaded file
+
+    Returns:
+        bool: True if the file is allowed, False otherwise
+    """
     return "." in filename and \
-            filename.rsplit(".", 1)[1] in ALLOWED_EXTENSIONS
+        filename.rsplit(".", 1)[1] in ALLOWED_EXTENSIONS
 
 
 def parse(data: List[int]) -> List[List[int]]:
+    """
+    Groups the input data into lists of seven elements
+
+    Args:
+        data (List[int]): the input list of integers
+
+    Returns:
+        List[List[int]]: a list of lists
+    """
     ans = []
     i = 0
     while i < len(data):
