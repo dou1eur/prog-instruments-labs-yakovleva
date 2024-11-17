@@ -12,7 +12,7 @@ FORMATS = {
     "identifier": r"^\d{2}-\d{2}/\d{2}$",
     "occupation": r"^[а-яА-Яa-zA-ZёЁ\s-]+$", 
     "latitude": r"^-?([0-9]|[1-8][0-9])\.\d{1,6}$",
-    "blood_type": r"^(A|B|AB|O)[+-]$", 
+    "blood_type": r"^(A|B|AB|O)[+−]$", 
     "issn": r"^\d{4}-\d{4}$", 
     "uuid": r"^[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}$",
     "date": r"^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|1\d{1}|2\d{1}|3[01])$"
