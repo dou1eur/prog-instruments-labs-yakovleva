@@ -1,5 +1,6 @@
-import json
 import hashlib
+import json
+import os
 from typing import List
 
 """
@@ -38,9 +39,10 @@ def serialize_result(variant: int, checksum: str) -> None:
     :param variant: номер вашего варианта
     :param checksum: контрольная сумма, вычисленная через calculate_checksum()
     """
-    pass
+    result = {"variant": str(variant), "checksum": checksum}
+    with open(
+        os.path.join("prog-instruments-labs-yakovleva", "lab_3", "result.json"), "w"
+    ) as js_file:
+        json.dump(result, js_file, indent=2)
 
 
-if __name__ == "__main__":
-    print(calculate_checksum([1, 2, 3]))
-    print(calculate_checksum([3, 2, 1]))
