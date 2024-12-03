@@ -2,12 +2,20 @@
 Module for approximating sympy expressions using the Taylor series and Chebyshev polynomials.
 """
 
+import logging
+
 from sympy import Poly, series, Expr
 from sympy.plotting.plot import Plot, plot
 from sympy.abc import x
 from numpy import polyval
 from polynomial import lower_degree_to
 from typing import Tuple, Callable, List
+
+logging.basicConfig(
+    filename="prog-instruments-labs-yakovleva/lab_4/app.log",
+    level=logging.DEBUG,
+    format="%(asctime)s - %(levelname)s - %(message)s",
+)
 
 
 class Approximation:
@@ -41,7 +49,14 @@ class Approximation:
         self.interval = interval
         self.polynomial_degree = polynomial_degree
 
-        self.__approximate_function(taylor_degree, point)
+        logging.info("Initializing Approximation with function: %s", self.function)
+        logging.info("Interval: %s, Polynomial degree: %d, Taylor degree: %d, Point: %f", 
+                     interval, polynomial_degree, taylor_degree, point)
+
+        try:
+            self.__approximate_function(taylor_degree, point)
+        except Exception as e:
+            logging.error("Error during approximation: %s", str(e))
 
     def __approximate_function(self,
                                taylor_degree: int,
@@ -54,9 +69,13 @@ class Approximation:
         :rtype: None
         """
 
-        taylor_approximation = Poly(series(self.function, x, point, n=taylor_degree).removeO())
-
-        self.approximation = lower_degree_to(taylor_approximation, self.polynomial_degree)
+        logging.info("Creating Taylor approximation of degree %d around point %f", taylor_degree, point)
+        try:
+            taylor_approximation = Poly(series(self.function, x, point, n=taylor_degree).removeO())
+            self.approximation = lower_degree_to(taylor_approximation, self.polynomial_degree)
+            logging.info("Lowered polynomial degree to %d", self.approximation.degree())
+        except Exception as e:
+            logging.error("Error in creating Taylor approximation: %s", str(e))
 
     @property
     def coeffs(self) -> List[float]:
@@ -67,7 +86,9 @@ class Approximation:
         :rtype: List[float]
         """
 
-        return [float(coeff) for coeff in self.approximation.all_coeffs()]
+        coeffs = [float(coeff) for coeff in self.approximation.all_coeffs()]
+        logging.info("Coefficients of the approximation polynomial: %s", coeffs)
+        return coeffs
 
     def get_coeffs_as_table(self) -> str:
         """
@@ -100,6 +121,7 @@ class Approximation:
 
             table += f'| `{fcoeff:+1.20f}` | <code>{xterm}</code> |\n'
 
+        logging.info("Generated coefficient table:\n%s", table)
         return table
 
     def get_error(self,
@@ -117,9 +139,13 @@ class Approximation:
         curr_x = self.interval[0]
 
         while curr_x <= (self.interval[1] + step):
-            error = max(abs((self.function - self.approximation).subs({x: curr_x})), error)
+            try:
+                error = max(abs((self.function.as_poly() - self.approximation.as_expr()).subs({x: curr_x})), error)
+            except Exception as e:
+                logging.error("Error calculating error at x=%f: %s", curr_x, str(e))
             curr_x += step
 
+        logging.info("Calculated max error: %f", error)
         return float(error)
 
     def get_numpy_error(self,
@@ -139,9 +165,13 @@ class Approximation:
         curr_x = self.interval[0]
 
         while curr_x <= (self.interval[1] + step):
-            error = max(abs(function(curr_x) - polyval(coeffs, curr_x)), error)
+            try:
+                error = max(abs(function(curr_x) - polyval(coeffs, curr_x)), error)
+            except Exception as e:
+                logging.error("Error calculating numpy error at x=%f: %s", curr_x, str(e))
             curr_x += step
 
+        logging.info("Calculated numpy error: %f", error)
         return error
 
     def plot_approximation(self,
@@ -160,7 +190,7 @@ class Approximation:
 
         if title is None:
             title = f'f(x) $\\approx$ {self.function}'
-
+        logging.info("Plotting approximation with title: %s", title)
         return plot(self.approximation.as_expr(),
                     (x, self.interval[0], self.interval[1]),
                     title=title,
@@ -186,7 +216,7 @@ class Approximation:
 
         if title is None:
             title = f'y = |f(x) - {self.function}|'
-
+        logging.info("Plotting absolute error with title: %s", title)
         return plot(abs(self.function - self.approximation),
                     (x, self.interval[0], self.interval[1]),
                     title=title,
@@ -217,13 +247,20 @@ def get_best_approximation(function: Expr,
     if start_taylor_degree is None:
         start_taylor_degree = polynomial_degree + 1
 
-    prev_approximation = Approximation(function, interval, polynomial_degree, start_taylor_degree, point)
-    curr_approximation = Approximation(function, interval, polynomial_degree, start_taylor_degree + 1, point)
-    taylor_degree = start_taylor_degree + 2
+    logging.info("Finding best approximation with start Taylor degree: %d", start_taylor_degree)
+    
+    try:
+        prev_approximation = Approximation(function, interval, polynomial_degree, start_taylor_degree, point)
+        curr_approximation = Approximation(function, interval, polynomial_degree, start_taylor_degree + 1, point)
+        taylor_degree = start_taylor_degree + 2
 
-    while prev_approximation.get_error() > curr_approximation.get_error():
-        prev_approximation = curr_approximation
-        curr_approximation = Approximation(function, interval, polynomial_degree, taylor_degree, point)
-        taylor_degree += 1
+        while prev_approximation.get_error() > curr_approximation.get_error():
+            prev_approximation = curr_approximation
+            curr_approximation = Approximation(function, interval, polynomial_degree, taylor_degree, point)
+            taylor_degree += 1
 
-    return prev_approximation
+        logging.info("Best approximation found with max error: %f", prev_approximation.get_error())
+        return prev_approximation
+    except Exception as e:
+        logging.error("Error finding best approximation: %s", str(e))
+        raise
